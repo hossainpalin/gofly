@@ -4,7 +4,7 @@ import express, { Application, NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import path from "path";
 import { configureRoutes } from "./api-gateway";
-import globalErrorHandler from "./middlewares/global-error-handler";
+import globalErrorHandler from "./middlewares/error-handler";
 
 const app: Application = express();
 

@@ -1,3 +1,3 @@
-import ProductsRoute from "./product";
+import UserRoutes from "./user";
 
-export const routers = [{ path: "/products", route: ProductsRoute }];
+export const routers = [{ path: "/user", route: UserRoutes }];
