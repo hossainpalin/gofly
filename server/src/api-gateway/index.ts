@@ -1,4 +1,4 @@
-import { routers } from "@/routers";
+import { routers } from "routes";
 import { Application } from "express";
 
 export const configureRoutes = (app: Application) => {

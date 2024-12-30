@@ -4,7 +4,8 @@ import express, { Application, NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import path from "path";
 import { configureRoutes } from "./api-gateway";
-import globalErrorHandler from "./middlewares/error-handler";
+import { globalErrorHandler } from "./middlewares/error.middleware";
+import cookieParser from "cookie-parser";
 
 const app: Application = express();
 
@@ -25,6 +26,7 @@ const middlewares = [
   }),
   express.json(),
   express.urlencoded({ extended: true }),
+  cookieParser(),
   express.static(path.join(__dirname, "../", "public"))
 ];
 

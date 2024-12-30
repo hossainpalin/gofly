@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { Document, Model, model, Schema } from "mongoose";
+import jwt from "jsonwebtoken";
 
 interface UserSchema extends Document {
   _id: string;
@@ -8,13 +8,12 @@ interface UserSchema extends Document {
   email: string;
   password: string;
   socketId: string;
+  verifyHashPassword(password: string): Promise<boolean>;
 }
 
-// Define an interface for the user model
-interface UserSchemaMethods extends Model<UserSchema> {
-  generateAuthToken(): string;
+interface UserStaticMethods extends Model<UserSchema> {
+  generateAuthToken(userId: string): string;
   generateHashPassword(password: string): Promise<string>;
-  verifyHashPassword(password: string): Promise<boolean>;
 }
 
 const userSchema: Schema<UserSchema> = new Schema(
@@ -43,9 +42,15 @@ const userSchema: Schema<UserSchema> = new Schema(
 );
 
 // Generate json web token
-userSchema.methods.generateAuthToken = function () {
-  const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET as string);
-  return token;
+userSchema.statics.generateAuthToken = function (userId: string) {
+  return jwt.sign({ _id: userId }, process.env.JWT_SECRET as string, {
+    expiresIn: "24h"
+  });
+};
+
+// Compare hash password
+userSchema.methods.verifyHashPassword = async function (password: string) {
+  return await bcrypt.compare(password, this.password);
 };
 
 // Generate password hash
@@ -54,10 +59,5 @@ userSchema.statics.generateHashPassword = async function (password: string) {
   return await bcrypt.hash(password, salt);
 };
 
-// Compare hash password
-userSchema.methods.verifyHashPassword = async function (password: string) {
-  return await bcrypt.compare(password, this.password);
-};
-
 // Export User model
-export const User = model<UserSchema, UserSchemaMethods>("User", userSchema);
+export const User = model<UserSchema, UserStaticMethods>("User", userSchema);
