@@ -2,9 +2,10 @@ import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
 import { User } from "@/models/user.model";
 import { BlackListToken } from "@/models/black-list-token.model";
+import { Captain } from "@/models/captain.model";
 
 export const checkLogin = async (
-  req: Request & { user?: any },
+  req: Request & { user?: any; captain?: any },
   res: Response,
   next: NextFunction
 ): Promise<any> => {
@@ -28,9 +29,19 @@ export const checkLogin = async (
       process.env.JWT_SECRET as string
     ) as jwt.JwtPayload;
 
-    req.user = await User.findById(decoded._id);
+    const user = await User.findById(decoded._id);
 
-    return next();
+    if (user) {
+      req.user = user;
+      return next();
+    }
+
+    const captain = await Captain.findById(decoded._id);
+
+    if (captain) {
+      req.captain = captain;
+      return next();
+    }
   } catch (error) {
     next(error);
   }

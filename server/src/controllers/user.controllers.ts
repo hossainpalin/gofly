@@ -1,9 +1,7 @@
 import { User } from "@/models/user.model";
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { MongoServerError } from "mongodb";
 import { BlackListToken } from "@/models/black-list-token.model";
-import mongoose from "mongoose";
 
 // User registration controller
 export const userRegister = async (
@@ -17,8 +15,16 @@ export const userRegister = async (
       return res.status(400).json({ errors: errors.array() });
     }
 
-    // User registration logic here
     const { fullName, email, password } = req.body;
+
+    // Check if user exists
+    const isUserExists = await User.findOne({ email });
+
+    if (isUserExists) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    // Hash password before saving
     const hashedPassword = await User.generateHashPassword(password);
 
     const user = {
@@ -30,15 +36,11 @@ export const userRegister = async (
     const newUser = new User(user);
     await newUser.save();
 
+    // Generate jwt token
     const token = User.generateAuthToken(newUser._id);
 
     return res.status(201).json({ token, user: newUser });
   } catch (error) {
-    if (error instanceof MongoServerError) {
-      if (error.code === 11000) {
-        return res.status(400).json({ message: "Email already exists" });
-      }
-    }
     next(error);
   }
 };
@@ -55,7 +57,6 @@ export const userLogin = async (
       return res.status(400).json({ errors: errors.array() });
     }
 
-    // User login logic here
     const { email, password } = req.body;
 
     // Check if user exists
@@ -109,14 +110,13 @@ export const userLogout = async (
       req.cookies.token ||
       (req.headers.authorization && req.headers.authorization.split(" ")[1]);
 
+    if (!token) {
+      return res.status(400).json({ message: "Token not found" });
+    }
+
     await BlackListToken.create({ token });
     return res.status(200).json({ message: "Logout successfully" });
   } catch (error) {
-    if (error instanceof mongoose.Error.ValidationError) {
-      if (error.errors.token.path === "token") {
-        return res.status(400).json({ message: "Token not found" });
-      }
-    }
     next(error);
   }
 };
