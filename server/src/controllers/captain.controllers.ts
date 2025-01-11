@@ -1,4 +1,3 @@
-// Captain register controller
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { Captain } from "@/models/captain.model";
@@ -19,7 +18,7 @@ export const captainRegister = async (
       fullName,
       email,
       password,
-      vehicle: { type, color, plateNumber, capacity }
+      vehicle: { type, color, numberPlate, capacity }
     } = req.body;
 
     // Check if captain exists
@@ -36,7 +35,7 @@ export const captainRegister = async (
       fullName,
       email,
       password: hashedPassword,
-      vehicle: { type, color, plateNumber, capacity }
+      vehicle: { type, color, numberPlate, capacity }
     };
 
     const newCaptain = new Captain(captain);

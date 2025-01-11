@@ -1,11 +1,11 @@
-import "dotenv/config";
+import cookieParser from "cookie-parser";
 import cors from "cors";
+import "dotenv/config";
 import express, { Application, NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import path from "path";
 import { configureRoutes } from "./api-gateway";
 import { globalErrorHandler } from "./middlewares/error.middleware";
-import cookieParser from "cookie-parser";
 
 const app: Application = express();
 

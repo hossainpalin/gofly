@@ -12,7 +12,7 @@ interface CaptainSchema extends Document {
   vehicle: {
     type: string;
     color: string;
-    plateNumber: string;
+    numberPlate: string;
     capacity: number;
   };
   location: {
@@ -69,10 +69,10 @@ const captainSchema: Schema<CaptainSchema> = new Schema(
         minLength: [3, "Color must be at least 3 characters long"],
         trim: true
       },
-      plateNumber: {
+      numberPlate: {
         type: String,
-        required: [true, "Plate number is required"],
-        minLength: [3, "Plate number must be at least 3 characters long"],
+        required: [true, "Number plate is required"],
+        minLength: [3, "Number plate must be at least 3 characters long"],
         trim: true
       },
       capacity: {

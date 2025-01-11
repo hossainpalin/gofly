@@ -1,11 +1,17 @@
+import useUser from "@/hooks/use-user";
 import { cn } from "@/lib/utils";
 import {
   UserLoginSchema,
   userLoginSchema,
   userSignupSchema
 } from "@/schema/user.schema";
+import { UserLoginResponse } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios, { AxiosError } from "axios";
+import { AlertTriangle } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 interface UserAuthFormProps {
   loginForm?: boolean;
@@ -16,10 +22,15 @@ interface UserAuthFormSchema extends UserLoginSchema {
 }
 
 export default function UserAuthForm({ loginForm }: UserAuthFormProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { setUser } = useUser();
+
   const {
     register,
     handleSubmit,
     clearErrors,
+    setError,
     formState: { errors }
   } = useForm<UserAuthFormSchema>({
     shouldFocusError: false,
@@ -37,7 +48,50 @@ export default function UserAuthForm({ loginForm }: UserAuthFormProps) {
   });
 
   const handleAuthSubmit = async (data: UserAuthFormSchema) => {
-    console.log(data);
+    try {
+      setIsLoading(true);
+      if (loginForm) {
+        const response = await axios.post("api/users/login", data);
+
+        if (response.status === 200) {
+          const result = response.data as UserLoginResponse;
+
+          const user = {
+            id: result.user._id,
+            email: result.user.email,
+            fullName: result.user.fullName,
+            token: result.token
+          };
+
+          setUser(user);
+        }
+      } else {
+        const response = await axios.post("api/users/register", data);
+
+        if (response.status === 201) {
+          return navigate("/user-login");
+        }
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setError("root", {
+          type: "manual",
+          message: error?.response?.data.error
+        });
+      } else if (error instanceof Error) {
+        setError("root", {
+          type: "manual",
+          message: error.message
+        });
+      } else {
+        setError("root", {
+          type: "manual",
+          message: "An error occurred. Please try again."
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -48,6 +102,15 @@ export default function UserAuthForm({ loginForm }: UserAuthFormProps) {
         handleSubmit(handleAuthSubmit)(e);
       }}
       className="flex w-full flex-col gap-4 py-6">
+      {errors.root && (
+        <p className="flex w-full items-center justify-start gap-2 rounded-md bg-red-400/40 px-3 py-2 text-red-700">
+          <span className="inline-block">
+            <AlertTriangle className="size-6" />
+          </span>
+          <span className="inline-block">{errors.root.message}</span>
+        </p>
+      )}
+
       {!loginForm && (
         <div className="flex flex-col gap-1">
           <label className="text-gray-800" htmlFor="fullName">
@@ -111,9 +174,16 @@ export default function UserAuthForm({ loginForm }: UserAuthFormProps) {
       </div>
 
       <button
+        disabled={isLoading}
         className="mt-4 rounded-md bg-black px-3 py-2 text-white"
         type="submit">
-        {loginForm ? "Login" : "Create Account"}
+        {loginForm
+          ? isLoading
+            ? "Processing..."
+            : "Login"
+          : isLoading
+            ? "Processing..."
+            : "Create Account"}
       </button>
     </form>
   );

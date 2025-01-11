@@ -1,6 +1,6 @@
 import Logo from "@/assets/icons/logo.png";
-import UserAuthForm from "@/components/auth/user-auth-form";
 import { Link } from "react-router-dom";
+import UserAuthForm from "@/components/auth/user-auth-form.tsx";
 
 export default function UserLogin() {
   return (
@@ -16,7 +16,7 @@ export default function UserLogin() {
         <div>
           <p className="text-gray-800">
             Don't have an account?{" "}
-            <Link className="text-blue-500" to="/signup">
+            <Link className="text-blue-500" to="/user-signup">
               Sign up
             </Link>
           </p>

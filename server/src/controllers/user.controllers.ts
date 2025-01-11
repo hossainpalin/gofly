@@ -1,7 +1,7 @@
+import { BlackListToken } from "@/models/black-list-token.model";
 import { User } from "@/models/user.model";
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { BlackListToken } from "@/models/black-list-token.model";
 
 // User registration controller
 export const userRegister = async (
@@ -21,7 +21,7 @@ export const userRegister = async (
     const isUserExists = await User.findOne({ email });
 
     if (isUserExists) {
-      return res.status(400).json({ message: "Email already exists" });
+      return res.status(400).json({ error: "Email already exists" });
     }
 
     // Hash password before saving
@@ -63,14 +63,14 @@ export const userLogin = async (
     const existingUser = await User.findOne({ email }).select("+password");
 
     if (!existingUser) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     // Check if password is correct
     const isPasswordMatch = await existingUser.verifyHashPassword(password);
 
     if (!isPasswordMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     // Generate jwt token
