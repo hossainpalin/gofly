@@ -1,18 +1,21 @@
-import Logo from "@/assets/icons/logo.png";
-import UserIcon from "@/assets/icons/user.svg";
 import TripForm from "@/components/trip/trip-form.tsx";
+import UserAvatar from "@/components/user/user-avatar.tsx";
+import BrandLogo from "@/components/common/brand-logo.tsx";
+import VehicleList from "@/components/vehicle/vehicle-list.tsx";
+import ConfirmRide from "@/components/trip/confirm-ride.tsx";
 
 export default function Trip() {
   return (
-    <div className="size-full bg-red-300">
-      <img className="absolute left-8 top-8 w-20" src={Logo} alt="logo" />
-      <img
-        className="absolute right-8 top-8 w-8 overflow-hidden rounded-full bg-gray-100 p-1.5"
-        src={UserIcon}
-        alt="user-icon"
-      />
-
+    <div
+      className="relative size-full overflow-hidden bg-cover bg-top bg-no-repeat"
+      style={{
+        backgroundImage: "url(/map.gif)"
+      }}>
+      <BrandLogo className="absolute left-8 top-8 w-20" />
+      <UserAvatar />
       <TripForm />
+      <VehicleList />
+      <ConfirmRide />
     </div>
   );
 }

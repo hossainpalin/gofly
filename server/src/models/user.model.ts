@@ -62,5 +62,5 @@ userSchema.statics.generateHashPassword = async function (password: string) {
   return await bcrypt.hash(password, salt);
 };
 
-// Export User model
+// Export UserAvatar model
 export const User = model<UserSchema, UserStaticMethods>("User", userSchema);

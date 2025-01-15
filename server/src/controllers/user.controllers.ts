@@ -3,7 +3,7 @@ import { User } from "@/models/user.model";
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 
-// User registration controller
+// UserAvatar registration controller
 export const userRegister = async (
   req: Request,
   res: Response,
@@ -45,7 +45,7 @@ export const userRegister = async (
   }
 };
 
-// User login controller
+// UserAvatar login controller
 export const userLogin = async (
   req: Request,
   res: Response,
@@ -98,7 +98,7 @@ export const getUserProfile = async (
   }
 };
 
-// User logout controller
+// UserAvatar logout controller
 export const userLogout = async (
   req: Request,
   res: Response,
